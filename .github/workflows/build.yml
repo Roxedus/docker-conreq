@@ -12,7 +12,7 @@ on:
       - "root/**"
       - ".github/workflows/build.yml"
     branches:
-      - main
+      - master
       - dev
 
 jobs:
@@ -68,7 +68,11 @@ jobs:
         id: prep
         run: |
           ARCHITECTURE=${{ matrix.architecture }}
-          VERSION=${${{ github.event.inputs.commit }}:=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main | jq -r '. | .sha')}
+          if [ -z "$GITHUB_EVENT_INPUTS_COMMIT" ]; then
+            VERSION=$GITHUB_EVENT_INPUTS_COMMIT
+          else
+            VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main | jq -r '. | .sha')
+          fi
           BUILD_ARGS=CONREQ_VERSION=${VERSION},PACKAGE_VERSION=${GITHUB_REF//refs\/heads\//}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}
           echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo ::set-output name=title::${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}

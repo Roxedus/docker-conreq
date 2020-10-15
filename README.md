@@ -8,7 +8,7 @@
 version: "2.1"
 services:
   conreq:
-    image: roxedus/conreq
+    image: ghcr.io/roxedus/conreq:latest
     container_name: conreq
     environment:
       - PUID=1000

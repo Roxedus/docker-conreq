@@ -87,7 +87,7 @@ jobs:
           push: true
           platforms: ${{ steps.prep.outputs.platform }}
           file: ./Dockerfile
-          #cache-from: ${{ steps.prep.outputs.cache }}
+          cache-from: ${{ steps.prep.outputs.cache }}
           cache-to: ${{ steps.prep.outputs.cache }}
           tags: |
             ${{ steps.prep.outputs.tag }}

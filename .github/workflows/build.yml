@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       commit:
-        description: "Commit to vuild"
-        required: true
+        description: "Commit to build"
+        required: false
   push:
     paths:
       - "Dockerfile"

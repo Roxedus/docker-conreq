@@ -9,6 +9,7 @@ ENV DJANGO_SUPERUSER_USERNAME=demo \
     DJANGO_SUPERUSER_EMAIL=email@gmail.home \
     DJANGO_SUPERUSER_PASSWORD=secretpass
 
+# hadolint ignore=DL3018,DL4006
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \

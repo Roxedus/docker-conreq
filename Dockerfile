@@ -25,7 +25,7 @@ RUN \
  echo "**** install app ****" && \
  mkdir -p /app/conreq && \
  echo "$CONREQ_VERSION" && \
- if [ -z ${CONREQ_VERSION+x} ]; then \
+ if [ -z ${CONREQ_VERSION} ]; then \
     CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main \
 	| jq -r '. | .sha'); \
  fi && \

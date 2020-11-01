@@ -24,12 +24,12 @@ RUN \
     python3 && \
  echo "**** install app ****" && \
  mkdir -p /app/conreq && \
- echo $CONREQ_VERSION && \
+ echo "$CONREQ_VERSION" && \
  if [ -z ${CONREQ_VERSION+x} ]; then \
     CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main \
 	| jq -r '. | .sha'); \
  fi && \
- echo $CONREQ_VERSION && \
+ echo "$CONREQ_VERSION" && \
  curl -o \
  /tmp/conreq.tar.gz -L \
     "https://github.com/archmonger/conreq/archive/${CONREQ_VERSION}.tar.gz" && \

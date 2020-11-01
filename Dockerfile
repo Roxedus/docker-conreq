@@ -1,7 +1,6 @@
 FROM lsiobase/alpine:3.12
 
 # set version label
-ARG BUILD_DATE
 ARG CONREQ_VERSION
 
 # Temp Defaults

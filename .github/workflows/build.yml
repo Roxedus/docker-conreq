@@ -53,7 +53,7 @@ jobs:
 
     strategy:
       matrix:
-        architecture: [linux-amd64] #linux-arm-v7, linux-arm64,
+        architecture: [linux-arm-v7, linux-arm64, linux-amd64]
 
     steps:
       - uses: actions/checkout@v2
@@ -81,11 +81,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: test
-        run: |
-          echo "::echo::on"
-          echo "${{ toJson(needs.updates) }}"
-
       - name: Prepare
         id: prep
         run: |
@@ -100,7 +95,7 @@ jobs:
           echo ::set-output name=cache::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
           echo ::set-output name=tag::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
           echo ::set-output name=version::${{ needs.updates.outputs.commit }}
-          echo ::set-output name=build-args::CONREQ_VERSION=${{ needs.updates.outputs.commit }}-1
+          echo ::set-output name=build-args::CONREQ_VERSION=${{ needs.updates.outputs.commit }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -130,7 +125,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-20.04
-    needs: [build]
+    needs: [build, updates]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -158,7 +153,7 @@ jobs:
           docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
           docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
-          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
+          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
 
       - name: Create manifests for GitHub Container Registry
         env:
@@ -170,4 +165,4 @@ jobs:
           docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
           docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
-          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
+          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}

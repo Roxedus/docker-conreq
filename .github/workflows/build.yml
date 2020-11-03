@@ -1,11 +1,6 @@
 name: Build Container
 
 on:
-  workflow_dispatch:
-    inputs:
-      commit:
-        description: "Commit to build"
-        required: false
   push:
     paths:
       - "Dockerfile"
@@ -14,11 +9,37 @@ on:
     branches:
       - master
       - dev
+  schedule:
+    - cron: "0 * * * *"
 
 jobs:
+  check_updates:
+    name: Check latest version
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.vars.outputs.commit }}
+    steps:
+      - name: Create VARS
+        id: vars
+        run: |
+          CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main  | jq -r '. | .sha')
+          DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
+          if [ $(echo "$CONREQ_VERSION" | tr -d -c '.' | awk '{ print length; }') = "1" ]; then
+              commit="${CONREQ_VERSION}.0"
+          else
+              commit="${CONREQ_VERSION}"
+          fi
+          if echo "${DOCKER_TAGS}" | grep -q "\"conreq-${commit}\""; then
+              echo "latest version ${CONREQ_VERSION} already built"
+          else
+              echo "::set-output name=commit::${commit}"
+          fi
+
   checks:
     name: Shellcheck
     runs-on: ubuntu-latest
+    if: needs.check_updates.outputs.commit
+    needs: [check_updates]
     steps:
       - uses: actions/checkout@v2
       - name: Run ShellCheck
@@ -68,7 +89,7 @@ jobs:
         id: prep
         run: |
           ARCHITECTURE=${{ matrix.architecture }}
-          VERSION=${GITHUB_EVENT_INPUTS_COMMIT}
+          VERSION=${{ needs.check_updates.outputs.commit }}
           BUILD_ARGS=CONREQ_VERSION=${VERSION}
           echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo ::set-output name=title::${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}
@@ -81,6 +102,7 @@ jobs:
           echo ::set-output name=tag::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
           echo ::set-output name=version::${VERSION}
           echo ::set-output name=build-args::${BUILD_ARGS}
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -134,9 +156,11 @@ jobs:
           IMAGE="$(echo ${GITHUB_REPOSITORY//docker-/} | tr '[:upper:]' '[:lower:]')"
           TAG=${GITHUB_REF//refs\/heads\//}
           SOURCE=${IMAGE}:${TAG}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}
-          docker manifest create ${IMAGE}:${TAG}                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
-          docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:latest                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
+          docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
+          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:conreq-${{ needs.check_updates.outputs.commit }}  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.check_updates.outputs.commit }}
+
       - name: Create manifests for GitHub Container Registry
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
@@ -144,6 +168,7 @@ jobs:
           IMAGE="ghcr.io/$(echo ${GITHUB_REPOSITORY//docker-/} | tr '[:upper:]' '[:lower:]')"
           TAG=${GITHUB_REF//refs\/heads\//}
           SOURCE=${IMAGE}:${TAG}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}
-          docker manifest create ${IMAGE}:${TAG}                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
-          docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:latest                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
+          docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
+          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:conreq-${{ needs.check_updates.outputs.commit }}  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.check_updates.outputs.commit }}

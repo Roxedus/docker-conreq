@@ -1,10 +1,11 @@
-FROM lsiobase/alpine:3.12
+FROM ghcr.io/linuxserver/baseimage-alpine:3.12
 
 # set version label
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DJANGO_SUPERUSER_USERNAME=demo \
+ENV DATA_DIR=/config \
+    DJANGO_SUPERUSER_USERNAME=demo \
     DJANGO_SUPERUSER_EMAIL=email@gmail.home \
     DJANGO_SUPERUSER_PASSWORD=secretpass
 
@@ -12,10 +13,12 @@ ENV DJANGO_SUPERUSER_USERNAME=demo \
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
-    g++ \
-    gcc \
     curl \
+    g++ \
+    openssl-dev \
+    gcc \
     jq \
+    libffi-dev \
     py3-wheel \
     python3-dev && \
  echo "**** install packages ****" && \

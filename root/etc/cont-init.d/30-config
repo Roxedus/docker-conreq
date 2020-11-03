@@ -6,17 +6,11 @@ if [ ! -f "/config/credentials.json" ]; then
 fi
 
 if [ ! -f "/config/db.sqlite3" ]; then
-    cd /config || exit 1
     python3 /app/conreq/manage.py migrate
     python3 /app/conreq/manage.py createsuperuser --noinput
-    mv /app/conreq/db.sqlite3 /config/db.sqlite3
-fi
-
-if [ ! -f "/app/conreq/db.sqlite3" ]; then
-    ln -s /config/db.sqlite3 /app/conreq/db.sqlite3
 fi
 
 # permissions
 chown -R abc:abc \
-	/app \
-	/config
+    /app \
+    /config

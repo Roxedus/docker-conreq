@@ -5,8 +5,10 @@ if [ ! -f "/config/credentials.json" ]; then
     cp /defaults/credentials.json /config/credentials.json
 fi
 
+python3 /app/conreq/manage.py makemigrations
+python3 /app/conreq/manage.py migrate
+
 if [ ! -f "/config/db.sqlite3" ]; then
-    python3 /app/conreq/manage.py migrate
     python3 /app/conreq/manage.py createsuperuser --noinput
 fi
 

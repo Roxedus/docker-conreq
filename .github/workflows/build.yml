@@ -26,7 +26,7 @@ jobs:
           export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
           if echo "${DOCKER_TAGS}" | grep -q "\"conreq-${CONREQ_VERSION}\""; then
             echo "latest version ${CONREQ_VERSION} already built"
-            exit 1
+            #exit 1
           else
             echo "::set-output name=commit::${CONREQ_VERSION}"
           fi

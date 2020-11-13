@@ -5,5 +5,4 @@ cd /config || exit 1
 
 exec \
     s6-setuidgid abc python3 /app/conreq/manage.py runserver \
-    0.0.0.0:8000 \
-    --pythonpath /app/conreq
+    0.0.0.0:8000

@@ -4,10 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.12
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config \
-    DJANGO_SUPERUSER_USERNAME=demo \
-    DJANGO_SUPERUSER_EMAIL=email@gmail.home \
-    DJANGO_SUPERUSER_PASSWORD=secretpass
+ENV DATA_DIR=/config
 
 # hadolint ignore=DL3018,DL4006
 RUN \

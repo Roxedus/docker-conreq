@@ -2,6 +2,7 @@
 
 ## **FOR DEMO PURPOSES ONLY**
 
+Default username and password is `demo` and `secretpass` if not specified with `-e password`
 
 ```yml
 ---
@@ -14,9 +15,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-      - DJANGO_SUPERUSER_USERNAME=demo #optional
-      - DJANGO_SUPERUSER_EMAIL=email@gmail.home #optional
-      - DJANGO_SUPERUSER_PASSWORD=secretpass #optional
+      - password=secretpass #optional
     volumes:
       - /path/to/config:/config
     ports:

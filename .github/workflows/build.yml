@@ -34,7 +34,7 @@ jobs:
   checks:
     name: Shellcheck
     runs-on: ubuntu-latest
-    if: "needs.updates.outputs.commit != 'no'"
+    if: "needs.updates.outputs.commit != 'no' || github.event_name != 'schedule'"
     needs: [updates]
     steps:
       - uses: actions/checkout@v2
@@ -95,7 +95,9 @@ jobs:
           echo ::set-output name=cache::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
           echo ::set-output name=tag::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
           echo ::set-output name=version::${{ needs.updates.outputs.commit }}
-          echo ::set-output name=build-args::CONREQ_VERSION=${{ needs.updates.outputs.commit }}
+          if [[ ! ${{ needs.updates.outputs.commit }} == no ]]; then
+            echo ::set-output name=build-args::CONREQ_VERSION=${{ needs.updates.outputs.commit }}
+          fi
 
       - name: Build and push
         uses: docker/build-push-action@v2

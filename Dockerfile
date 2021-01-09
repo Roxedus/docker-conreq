@@ -10,14 +10,27 @@ ENV DATA_DIR=/config
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
+    build-base \
     curl \
+    freetype-dev \
+    fribidi-dev \
     g++ \
-    openssl-dev \
     gcc \
+    harfbuzz-dev \
+    jpeg-dev \
     jq \
+    lcms2-dev \
     libffi-dev \
+    openjpeg-dev \
+    openssl-dev \
     py3-wheel \
-    python3-dev && \
+    python3 \
+    python3-dev \
+    python3-dev \
+    tcl-dev \
+    tiff-dev \
+    tk-dev \
+    zlib-dev && \
  echo "**** install packages ****" && \
  apk add --no-cache \
     py3-pip \

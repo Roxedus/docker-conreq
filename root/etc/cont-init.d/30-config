@@ -1,15 +1,12 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-if [ ! -f "/config/credentials.json" ]; then
-    cp /defaults/credentials.json /config/credentials.json
-fi
-
 cd /app/conreq || return
 
 python3 ./manage.py makemigrations
 python3 ./manage.py migrate
 python3 ./manage.py check
+python3 ./manage.py collectstatic
 
 # permissions
 chown -R abc:abc \

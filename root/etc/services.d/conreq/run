@@ -1,8 +1,8 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-cd /config || exit 1
+cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc python3 /app/conreq/manage.py runserver \
-    0.0.0.0:8000
+    s6-setuidgid abc daphne conreq.asgi:application \
+    -b 0.0.0.0

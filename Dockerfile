@@ -4,7 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.12
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config
+ENV DATA_DIR=/config DEBUG=False
 
 # hadolint ignore=DL3018,DL4006
 RUN \

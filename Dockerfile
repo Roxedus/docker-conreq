@@ -1,10 +1,10 @@
-FROM ghcr.io/linuxserver/baseimage-alpine:3.12
+FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 
 # set version label
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config DEBUG=False
+ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/config/key.pem
 
 # hadolint ignore=DL3018,DL4006
 RUN \

@@ -16,6 +16,9 @@ services:
       - PGID=1000
       - TZ=Europe/London
       - password=secretpass #optional
+      - SSL=false #optional
+      - SSL_CERT=/config/crt.pem #Required when using SSL=true
+      - SSL_KEY=/config/key.pem #Required when using SSL=true
     volumes:
       - /path/to/config:/config
     ports:

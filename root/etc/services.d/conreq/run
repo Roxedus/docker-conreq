@@ -1,8 +1,16 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+if [[ "${SSL}" = true ]] && [ -f "$SSL_CERT" ] && [ -f "$SSL_KEY" ]; then
+    SSL_STRING=(-e "ssl:8000:privateKey=$SSL_KEY:certKey=$SSL_CERT")
+    export USE_SSL=True
+elif [[ "${SSL}" = true ]]; then
+    [ ! -f "$SSL_CERT" ] && echo "Could not find the certificate $SSL_CERT, not starting with SSL"
+    [ ! -f "$SSL_KEY" ] && echo "Could not find the key $SSL_KEY, not starting with SSL"
+fi
+
 cd /app/conreq || exit 1
 
 exec \
     s6-setuidgid abc daphne conreq.asgi:application \
-    -b 0.0.0.0
+        -b 0.0.0.0 "${SSL_STRING[@]}"

@@ -6,7 +6,8 @@ cd /app/conreq || return
 python3 ./manage.py makemigrations
 python3 ./manage.py migrate
 python3 ./manage.py check
-python3 ./manage.py collectstatic
+
+[ ! -d /app/conrec/static-deploy ] && python3 ./manage.py collectstatic
 
 # permissions
 chown -R abc:abc \

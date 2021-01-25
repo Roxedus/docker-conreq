@@ -7,7 +7,7 @@ python3 ./manage.py makemigrations
 python3 ./manage.py migrate
 python3 ./manage.py check
 
-[ ! -d /app/conrec/static-deploy ] && python3 ./manage.py collectstatic
+[ ! -d /app/conreq/static-deploy ] && python3 ./manage.py collectstatic
 
 # permissions
 chown -R abc:abc \

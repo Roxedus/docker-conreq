@@ -13,4 +13,5 @@ cd /app/conreq || exit 1
 
 exec \
     s6-setuidgid abc daphne conreq.asgi:application \
-        -b 0.0.0.0 "${SSL_STRING[@]}"
+        -b 0.0.0.0 "${SSL_STRING[@]}" \
+        --access-log /config/logs/access.log

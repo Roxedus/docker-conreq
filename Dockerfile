@@ -51,6 +51,8 @@ RUN \
     /app/conreq --strip-components=1 && \
  echo "**** install pip packages ****" && \
  pip3 install --no-cache-dir -U -r /app/conreq/requirements.txt && \
+ echo "**** generate static content ****" && \
+ python3 /app/conreq/manage.py collectstatic && \
  echo "**** cleanup ****" && \
  apk del --purge \
     build-dependencies && \

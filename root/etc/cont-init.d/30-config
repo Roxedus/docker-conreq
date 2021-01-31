@@ -3,7 +3,8 @@
 
 cd /app/conreq || return
 
-python3 ./manage.py migrate
+python3 ./manage.py migrate --noinput
+python3 ./manage.py collectstatic --link --noinput
 
 # permissions
 chown -R abc:abc \

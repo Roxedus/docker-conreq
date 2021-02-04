@@ -7,10 +7,9 @@ on:
       - "root/**"
       - ".github/workflows/build.yml"
     branches:
-      - master
-      - dev
+      - develop
   schedule:
-    - cron: "0 * * * *"
+    - cron: "30 * * * *"
 
 jobs:
   updates:
@@ -22,7 +21,7 @@ jobs:
       - name: Create VARS
         id: vars
         run: |
-          export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main  | jq -r '. | .sha')
+          export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/develop  | jq -r '. | .sha')
           export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
           if echo "${DOCKER_TAGS}" | grep -q "\"conreq-${CONREQ_VERSION}\""; then
             echo "latest version ${CONREQ_VERSION} already built"
@@ -154,7 +153,6 @@ jobs:
           SOURCE=${IMAGE}:${TAG}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}
           docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
           docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
 
       - name: Create manifests for GitHub Container Registry
@@ -166,5 +164,4 @@ jobs:
           SOURCE=${IMAGE}:${TAG}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}
           docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
           docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}

@@ -1,13 +1,13 @@
 # [Roxedus/docker-conreq](https://github.com/Roxedus/docker-conreq)
 
-## **FOR DEMO PURPOSES ONLY**
+## This is built againt the develop branch, you have been warned
 
 ```yml
 ---
 version: "2.1"
 services:
   conreq:
-    image: ghcr.io/roxedus/conreq:latest
+    image: ghcr.io/roxedus/conreq:develop
     container_name: conreq
     environment:
       - PUID=1000

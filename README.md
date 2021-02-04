@@ -1,6 +1,6 @@
 # [Roxedus/docker-conreq](https://github.com/Roxedus/docker-conreq)
 
-Container for [Conrec](https://github.com/Archmonger/Conreq)
+Container for [Conreq](https://github.com/Archmonger/Conreq)
 
 ```yml
 ---

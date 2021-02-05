@@ -1,17 +1,24 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+# Standard execution parameters
+DAPHNE_PARAMS=("-b 0.0.0.0")
+
+# Check if SSL is enabled, and cert/keys exist
 if [[ "${SSL}" = true ]] && [ -f "$SSL_CERT" ] && [ -f "$SSL_KEY" ]; then
-    SSL_STRING=(-e "ssl:8000:privateKey=$SSL_KEY:certKey=$SSL_CERT")
-    export USE_SSL=True
+    # Instruct Daphne to use SSL via Twisted parameter passthrough
+    DAPHNE_PARAMS=("-e  ssl:8000:privateKey=$SSL_KEY:certKey=$SSL_CERT")
+
+# The user's key or cert file didn't exist
 elif [[ "${SSL}" = true ]]; then
-    [ ! -f "$SSL_CERT" ] && echo "Could not find the certificate $SSL_CERT, not starting with SSL"
-    [ ! -f "$SSL_KEY" ] && echo "Could not find the key $SSL_KEY, not starting with SSL"
+    # Notify the user that he messed up
+    [ ! -f "$SSL_CERT" ] && echo "Not starting with SSL. Could not find the certificate \"$SSL_CERT\""
+    [ ! -f "$SSL_KEY" ] && echo "Not starting with SSL. Could not find the key \"$SSL_KEY\""
 fi
 
 cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc daphne conreq.asgi:application \
-        -b 0.0.0.0 "${SSL_STRING[@]}" \
-        --access-log /config/logs/access.log
+    s6-setuidgid abc daphne $DAPHNE_PARAMS \
+    conreq.asgi:application \
+    --access-log /config/logs/access.log

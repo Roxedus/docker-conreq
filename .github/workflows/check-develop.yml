@@ -1,0 +1,25 @@
+name: Check develop
+
+on:
+  schedule:
+    - cron: "30 * * * *"
+
+jobs:
+  updates:
+    name: Check latest version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create VARS
+        run: |
+          export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/develop  | jq -r '. | .sha')
+          export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
+          if echo "${DOCKER_TAGS}" | grep -q "\"conreq-${CONREQ_VERSION}\""; then
+            echo "latest version ${CONREQ_VERSION} already built"
+          else
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/Roxedus/docker-conreq/actions/workflows/build.yml/dispatches \
+              -d "{\"ref\":\"develop\", \"inputs\":{\"CONREQ_VERSION\": \"${CONREQ_VERSION}\"}" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
+          fi

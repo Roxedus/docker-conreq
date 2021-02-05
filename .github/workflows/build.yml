@@ -33,7 +33,7 @@ jobs:
   checks:
     name: Shellcheck
     runs-on: ubuntu-latest
-    if: "needs.updates.outputs.commit != 'no' || github.event_name != 'schedule'"
+    if: needs.updates.outputs.commit != 'no' || github.event_name != 'schedule'
     needs: [updates]
     steps:
       - uses: actions/checkout@v2

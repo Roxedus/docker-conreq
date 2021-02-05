@@ -39,7 +39,7 @@ RUN \
  mkdir -p /app/conreq && \
  echo "$CONREQ_VERSION" && \
  if [ -z "${CONREQ_VERSION}" ]; then \
-    CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main \
+    CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/develop \
     | jq -r '. | .sha'); \
  fi && \
  echo "$CONREQ_VERSION" && \

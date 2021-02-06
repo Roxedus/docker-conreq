@@ -23,7 +23,7 @@ jobs:
         run: |
           export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main  | jq -r '. | .sha')
           export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
-          if echo "${DOCKER_TAGS}" | grep -q "\"conreq-${CONREQ_VERSION}\""; then
+          if echo "${DOCKER_TAGS}" | grep -q "\"master-${CONREQ_VERSION}\""; then
             echo "latest version ${CONREQ_VERSION} already built"
             echo "::set-output name=commit::no"
           else

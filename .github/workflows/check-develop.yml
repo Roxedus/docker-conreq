@@ -3,7 +3,9 @@ name: Check develop
 on:
   schedule:
     - cron: "30 * * * *"
-
+  push:
+    paths:
+      - ".github/workflows/check-develop.yml"
 jobs:
   updates:
     name: Check latest version

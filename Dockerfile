@@ -20,7 +20,7 @@ RUN \
     py3-wheel \
     python3 \
     python3-dev \
-    python3-dev && \
+    cargo && \
  echo "**** install packages ****" && \
  apk add --no-cache \
     freetype-dev \

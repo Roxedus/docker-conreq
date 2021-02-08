@@ -4,7 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/config/key.pem
+ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/config/key.pem CRYPTOGRAPHY_DONT_BUILD_RUST=true
 
 # hadolint ignore=DL3018,DL4006
 RUN \
@@ -19,8 +19,7 @@ RUN \
     openssl-dev \
     py3-wheel \
     python3 \
-    python3-dev \
-    cargo && \
+    python3-dev && \
  echo "**** install packages ****" && \
  apk add --no-cache \
     freetype-dev \

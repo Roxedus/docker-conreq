@@ -25,7 +25,7 @@ jobs:
         id: vars
         run: |
           if [ -z "$GITHUB_EVENT_INPUTS_CONREQ_VERSION" ]; then
-            export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main  | jq -r '. | .sha')
+            export CONREQ_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/conreq/commits/main | jq -r '. | .sha' | cut -c1-8)
             export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
             if echo "${DOCKER_TAGS}" | grep -q "\"main-${CONREQ_VERSION}\""; then
               echo "latest version ${CONREQ_VERSION} already built"

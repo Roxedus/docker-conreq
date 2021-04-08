@@ -10,6 +10,7 @@ ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/con
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
+    bsd-compat-headers \
     build-base \
     curl \
     g++ \

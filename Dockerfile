@@ -4,7 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/config/key.pem CRYPTOGRAPHY_DONT_BUILD_RUST=true
+ENV DATA_DIR=/config DEBUG=False SSL=false
 
 # hadolint ignore=DL3018,DL4006
 RUN \
@@ -12,6 +12,7 @@ RUN \
  apk add --no-cache --virtual=build-dependencies \
     bsd-compat-headers \
     build-base \
+    cargo \
     curl \
     g++ \
     gcc \
@@ -19,7 +20,6 @@ RUN \
     libffi-dev \
     openssl-dev \
     py3-wheel \
-    python3 \
     python3-dev && \
  echo "**** install packages ****" && \
  apk add --no-cache \
@@ -56,7 +56,10 @@ RUN \
     build-dependencies && \
  rm -rf \
     /root/.cache \
+    /root/.cache \
     /tmp/*
+
+EXPOSE 8000
 
 # add local files
 COPY root/ /

@@ -4,7 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config DEBUG=False SSL=false
+ENV DATA_DIR=/config DEBUG=False SSL=false CRYPTOGRAPHY_DONT_BUILD_RUST=true
 
 # hadolint ignore=DL3018,DL4006
 RUN \

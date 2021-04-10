@@ -13,7 +13,6 @@ cd /app/conreq || exit 1
 
 exec \
     s6-setuidgid abc hypercorn \
-    --quic-bind 0.0.0.0:8000 \
     --bind 0.0.0.0:8000 \
     --access-logfile /config/logs/access.log \
     --websocket-ping-interval 20 \

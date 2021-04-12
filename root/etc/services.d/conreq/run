@@ -16,7 +16,6 @@ exec \
     --bind 0.0.0.0:8000 \
     --access-logfile /config/logs/access.log \
     --websocket-ping-interval 20 \
-    --worker-class uvloop \
     --workers $(nproc) \
     "${HYPERCORN_PARAMS[@]}" \
     conreq.asgi:application

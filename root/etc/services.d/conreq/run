@@ -7,15 +7,17 @@ fi
 
 if [ -f "/config/hypercorn.toml" ]; then
     HYPERCORN_PARAMS=(--config /config/hypercorn.toml)
+else
+    HYPERCORN_PARAMS=(--bind 0.0.0.0:8000 \
+    --access-logfile /config/logs/access.log \
+    --websocket-ping-interval 20 \
+    --workers $(nproc) \
+    )
 fi
 
 cd /app/conreq || exit 1
 
 exec \
     s6-setuidgid abc hypercorn \
-    --bind 0.0.0.0:8000 \
-    --access-logfile /config/logs/access.log \
-    --websocket-ping-interval 20 \
-    --workers $(nproc) \
     "${HYPERCORN_PARAMS[@]}" \
     conreq.asgi:application

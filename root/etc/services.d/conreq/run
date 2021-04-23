@@ -1,24 +1,23 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-# Standard execution parameters
-DAPHNE_PARAMS=("-b 0.0.0.0")
+if [[ "${SSL}" = true ]]; then
+    echo -e "Setting SSL with enviroment files is currently unsupported.\nPlease create, and do your configuration in /config/hypercorn.toml acording to the docs:\nhttps://pgjones.gitlab.io/hypercorn/how_to_guides/configuring.html#configuration-options"
+fi
 
-# Check if SSL is enabled, and cert/keys exist
-if [[ "${SSL}" = true ]] && [ -f "$SSL_CERT" ] && [ -f "$SSL_KEY" ]; then
-    # Instruct Daphne to use SSL via Twisted parameter passthrough
-    DAPHNE_PARAMS=("-e  ssl:8000:privateKey=$SSL_KEY:certKey=$SSL_CERT")
-
-# The user's key or cert file didn't exist
-elif [[ "${SSL}" = true ]]; then
-    # Notify the user that he messed up
-    [ ! -f "$SSL_CERT" ] && echo "Not starting with SSL. Could not find the certificate \"$SSL_CERT\""
-    [ ! -f "$SSL_KEY" ] && echo "Not starting with SSL. Could not find the key \"$SSL_KEY\""
+if [ -f "/config/hypercorn.toml" ]; then
+    HYPERCORN_PARAMS=(--config /config/hypercorn.toml)
+else
+    HYPERCORN_PARAMS=(--bind 0.0.0.0:8000 \
+    --access-logfile /config/logs/access.log \
+    --websocket-ping-interval 20 \
+    --workers 6 \
+    )
 fi
 
 cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc daphne $DAPHNE_PARAMS \
-    conreq.asgi:application \
-    --access-log /config/logs/access.log
+    s6-setuidgid abc hypercorn \
+        "${HYPERCORN_PARAMS[@]}" \
+        conreq.asgi:application

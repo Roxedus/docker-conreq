@@ -4,7 +4,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 ARG CONREQ_VERSION
 
 # Temp Defaults
-ENV DATA_DIR=/config DEBUG=False SSL=false CRYPTOGRAPHY_DONT_BUILD_RUST=true
+ENV DATA_DIR=/config DEBUG=False WEBSERVER=Bjoern CRYPTOGRAPHY_DONT_BUILD_RUST=true
 
 # hadolint ignore=DL3018,DL4006
 RUN \
@@ -34,6 +34,7 @@ RUN \
     tcl-dev \
     tiff-dev \
     tk-dev \
+    libev-dev \
     zlib-dev && \
  echo "**** install app ****" && \
  mkdir -p /app/conreq && \

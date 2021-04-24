@@ -18,6 +18,7 @@ fi
 cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc hypercorn \
-    "${HYPERCORN_PARAMS[@]}" \
-    conreq.asgi:application
+    s6-setuidgid abc python3 ./wsgi_server.py
+    # s6-setuidgid abc hypercorn \
+    # "${HYPERCORN_PARAMS[@]}" \
+    # conreq.asgi:application

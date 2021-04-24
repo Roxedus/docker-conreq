@@ -11,14 +11,13 @@ else
     HYPERCORN_PARAMS=(--bind 0.0.0.0:8000 \
     --access-logfile /config/logs/access.log \
     --websocket-ping-interval 20 \
-    --workers $(nproc) \
+    --workers 6 \
     )
 fi
 
 cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc python3 ./wsgi_server.py
-    # s6-setuidgid abc hypercorn \
-    # "${HYPERCORN_PARAMS[@]}" \
-    # conreq.asgi:application
+    s6-setuidgid abc hypercorn \
+    "${HYPERCORN_PARAMS[@]}" \
+    conreq.asgi:application

@@ -17,9 +17,12 @@ RUN \
     g++ \
     gcc \
     jq \
+    libev-dev \
     libffi-dev \
     openssl-dev \
     py3-wheel \
+    build-base \
+        mariadb-dev \
     python3-dev && \
  echo "**** install packages ****" && \
  apk add --no-cache \
@@ -28,13 +31,13 @@ RUN \
     harfbuzz-dev \
     jpeg-dev \
     lcms2-dev \
+	mariadb-connector-c-dev \
     openjpeg-dev \
     py3-pip \
     python3 \
     tcl-dev \
     tiff-dev \
     tk-dev \
-    libev-dev \
     zlib-dev && \
  echo "**** install app ****" && \
  mkdir -p /app/conreq && \

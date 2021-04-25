@@ -20,6 +20,7 @@ RUN \
     g++ \
     gcc \
     jq \
+    libev-dev \
     libffi-dev \
     openssl-dev \
     py3-wheel \

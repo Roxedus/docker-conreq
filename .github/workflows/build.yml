@@ -87,7 +87,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.PERSONAL_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare
         id: prep
@@ -153,7 +153,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.PERSONAL_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create manifests for DockerHub
         env:

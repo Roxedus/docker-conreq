@@ -1,6 +1,6 @@
 # [Roxedus/docker-conreq](https://github.com/Roxedus/docker-conreq)
 
-## This is built againt the develop branch, you have been warned
+## This is built against the develop branch. You have been warned!
 
 ```yml
 ---
@@ -13,9 +13,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-      - SSL=false #optional
-      - SSL_CERT=/config/crt.pem #Required when using SSL=true
-      - SSL_KEY=/config/key.pem #Required when using SSL=true
     volumes:
       - /path/to/config:/config
     ports:

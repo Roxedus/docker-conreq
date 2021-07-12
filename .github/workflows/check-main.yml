@@ -23,5 +23,5 @@ jobs:
               -H "Accept: application/vnd.github.v3+json" \
               https://api.github.com/repos/Roxedus/docker-conreq/actions/workflows/build.yml/dispatches \
               -d "{\"ref\":\"refs/heads/main\", \"inputs\":{\"conreq_version\": \"${CONREQ_VERSION}\"}" \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
+              -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}"
           fi

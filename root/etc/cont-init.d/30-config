@@ -5,4 +5,3 @@ cd /app/conreq || return
 
 # Permissions
 python3 manage.py preconfig_conreq $(id -u abc) $(id -g abc)
-chown -R abc:abc /app 

@@ -3,12 +3,6 @@
 
 cd /app/conreq || return
 
-python3 ./manage.py migrate --noinput
-python3 ./manage.py collectstatic --link --noinput
-python3 ./manage.py compress
-s6-setuidgid abc python3 ./manage.py run_huey --quiet &
-
-# permissions
-chown -R abc:abc \
-    /app \
-    /config
+# Permissions
+python3 manage.py preconfig_conreq $(id -u abc) $(id -g abc)
+chown -R abc:abc /app 

@@ -1,23 +1,9 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-if [[ "${SSL}" = true ]]; then
-    echo -e "Setting SSL with enviroment files is currently unsupported.\nPlease create, and do your configuration in /config/hypercorn.toml acording to the docs:\nhttps://pgjones.gitlab.io/hypercorn/how_to_guides/configuring.html#configuration-options"
-fi
-
-if [ -f "/config/hypercorn.toml" ]; then
-    HYPERCORN_PARAMS=(--config /config/hypercorn.toml)
-else
-    HYPERCORN_PARAMS=(--bind 0.0.0.0:8000 \
-    --access-logfile /config/logs/access.log \
-    --websocket-ping-interval 20 \
-    --workers 6 \
-    )
-fi
-
 cd /app/conreq || exit 1
 
 exec \
-    s6-setuidgid abc hypercorn \
-        "${HYPERCORN_PARAMS[@]}" \
-        conreq.asgi:application
+    s6-setuidgid abc python3 \
+     manage.py run_conreq \
+     --disable-preconfig

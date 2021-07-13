@@ -3,11 +3,8 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.13
 # set version label
 ARG CONREQ_VERSION
 
-# Temp Defaults
-ENV DATA_DIR=/config DEBUG=False SSL=false SSL_CERT=/config/crt.pem SSL_KEY=/config/key.pem CRYPTOGRAPHY_DONT_BUILD_RUST=true
-
 # hadolint ignore=DL3018,DL4006
-ENV DATA_DIR=/config DEBUG=False SSL=false CRYPTOGRAPHY_DONT_BUILD_RUST=true
+ENV DATA_DIR=/config DEBUG=False CRYPTOGRAPHY_DONT_BUILD_RUST=true
 
 # hadolint ignore=DL3018,DL4006
 RUN \

@@ -16,6 +16,7 @@ RUN \
     curl \
     g++ \
     gcc \
+    git \
     jq \
     libev-dev \
     libffi-dev \
@@ -51,7 +52,7 @@ RUN \
     /tmp/conreq.tar.gz -C \
     /app/conreq --strip-components=1 && \
   echo "**** install pip packages ****" && \
-  pip3 install --no-cache-dir -U -r /app/conreq/requirements.txt && \
+  pip3 install --no-cache-dir -U -r /app/conreq/requirements/main.txt && \
   echo "**** cleanup ****" && \
   apk del --purge \
     build-dependencies && \

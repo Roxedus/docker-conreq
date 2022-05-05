@@ -20,6 +20,7 @@ RUN \
     jq \
     libev-dev \
     libffi-dev \
+    musl-dev \
     openssl-dev \
     py3-wheel \
     python3-dev && \

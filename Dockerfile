@@ -1,10 +1,10 @@
-FROM ghcr.io/linuxserver/baseimage-alpine:3.14
+FROM ghcr.io/linuxserver/baseimage-alpine:3.15
 
 # set version label
 ARG CONREQ_VERSION
 
 # hadolint ignore=DL3018,DL4006
-ENV DATA_DIR=/config DEBUG=False CRYPTOGRAPHY_DONT_BUILD_RUST=true
+ENV DATA_DIR=/config DEBUG=False
 
 # hadolint ignore=DL3018,DL4006
 RUN \
@@ -20,7 +20,6 @@ RUN \
     jq \
     libev-dev \
     libffi-dev \
-    musl-dev \
     openssl-dev \
     py3-wheel \
     python3-dev && \
@@ -53,13 +52,13 @@ RUN \
     /tmp/conreq.tar.gz -C \
     /app/conreq --strip-components=1 && \
   echo "**** install pip packages ****" && \
-  pip3 install --no-cache-dir -U -r /app/conreq/requirements/main.txt && \
+  pip3 install --no-cache-dir -U --find-links https://wheel-index.linuxserver.io/alpine/ -r /app/conreq/requirements/main.txt && \
   echo "**** cleanup ****" && \
   apk del --purge \
     build-dependencies && \
   rm -rf \
-    /root/.cargo \
     /root/.cache \
+    /root/.cargo \
     /tmp/*
 
 EXPOSE 8000

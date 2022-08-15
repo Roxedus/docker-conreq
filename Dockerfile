@@ -21,7 +21,6 @@ RUN \
     libev-dev \
     libffi-dev \
     openssl-dev \
-    py3-wheel \
     python3-dev && \
   echo "**** install packages ****" && \
   apk add --no-cache \
@@ -32,6 +31,7 @@ RUN \
     lcms2-dev \
     openjpeg-dev \
     py3-pip \
+    py3-wheel \
     python3 \
     tcl-dev \
     tiff-dev \

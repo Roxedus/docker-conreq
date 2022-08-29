@@ -1,7 +1,0 @@
-#!/usr/bin/with-contenv bash
-# shellcheck shell=bash
-
-cd /app/conreq || return
-
-# Permissions
-python3 manage.py preconfig_conreq $PUID $PGID

@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-alpine:3.15
+FROM ghcr.io/linuxserver/baseimage-alpine:3.16
 
 # set version label
 ARG CONREQ_VERSION
@@ -52,7 +52,7 @@ RUN \
     /tmp/conreq.tar.gz -C \
     /app/conreq --strip-components=1 && \
   echo "**** install pip packages ****" && \
-  pip3 install --no-cache-dir -U --find-links https://wheel-index.linuxserver.io/alpine/ -r /app/conreq/requirements/main.txt && \
+  pip3 install --no-cache-dir -U --find-links https://wheel-index.linuxserver.io/alpine-3.16/ -r /app/conreq/requirements/main.txt && \
   echo "**** cleanup ****" && \
   apk del --purge \
     build-dependencies && \

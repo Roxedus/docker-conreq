@@ -1,4 +1,4 @@
-FROM lspipepr/alpine:3.16
+FROM ghcr.io/linuxserver/baseimage-alpine:edge
 
 # set version label
 ARG CONREQ_VERSION

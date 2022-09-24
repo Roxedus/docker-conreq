@@ -1,4 +1,1 @@
-#!/command/execlineb
-# shellcheck disable=SC1000-SC9999
-
 /etc/s6-overlay/s6-rc.d/init-conreq/script

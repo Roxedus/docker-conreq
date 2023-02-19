@@ -29,13 +29,13 @@ jobs:
             export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
             if echo "${DOCKER_TAGS}" | grep -q "\"main-${CONREQ_VERSION}\""; then
               echo "latest version ${CONREQ_VERSION} already built"
-              echo "::set-output name=commit::no"
+              echo "name=commit=no" >> $GITHUB_OUTPUT
             else
-              echo "::set-output name=commit::${CONREQ_VERSION}"
+              echo "name=commit=${CONREQ_VERSION}" >> $GITHUB_OUTPUT
               echo "Commit manually built"
             fi
           else
-            echo "::set-output name=commit::${GITHUB_EVENT_INPUTS_CONREQ_VERSION}"
+            echo "name=commit=${GITHUB_EVENT_INPUTS_CONREQ_VERSION}" >> $GITHUB_OUTPUT
             echo "Commit automatically built"
           fi
 
@@ -45,7 +45,7 @@ jobs:
     if: needs.updates.outputs.commit != 'no'
     needs: [updates]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
 
@@ -65,26 +65,26 @@ jobs:
         architecture: [linux-arm-v7, linux-arm64, linux-amd64]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           install: true
           version: latest
           driver-opts: image=moby/buildkit:master
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_HUB_USER }}
@@ -96,24 +96,26 @@ jobs:
           conreq_commit: ${{ needs.updates.outputs.commit }}
         run: |
           ARCHITECTURE=${{ matrix.architecture }}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo ::set-output name=title::${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}
-          echo ::set-output name=revision::${conreq_commit}
-          echo ::set-output name=source::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_REF//refs\/heads\//}
-          echo ::set-output name=vendor::${{ github.repository_owner }}
-          echo ::set-output name=url::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md
-          echo ::set-output name=platform::${ARCHITECTURE//-/\/}
-          echo ::set-output name=cache::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
-          echo ::set-output name=tag::"$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')"
-          echo ::set-output name=version::${conreq_commit}
+          echo "name=created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "name=title=${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
+          echo "name=revision=${conreq_commit}" >> $GITHUB_OUTPUT
+          echo "name=source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
+          echo "name=vendor=${{ github.repository_owner }}" >> $GITHUB_OUTPUT
+          echo "name=url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md" >> $GITHUB_OUTPUT
+          echo "name=platform=${ARCHITECTURE//-/\/}" >> $GITHUB_OUTPUT
+          echo "name=cache="$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "name=tag="$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "name=version=${conreq_commit}" >> $GITHUB_OUTPUT
           if [[ ! ${conreq_commit} == "no" ]]; then
-            echo ::set-output name=build-args::CONREQ_VERSION=${conreq_commit}
+            echo "name=build-args=CONREQ_VERSION=${conreq_commit}" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           push: true
+          attests: type=sbom,generator=docker/buildkit-syft-scanner
+          provenance: true
           platforms: ${{ steps.prep.outputs.platform }}
           file: ./Dockerfile
           #cache-from: ${{ steps.prep.outputs.cache }}
@@ -131,26 +133,22 @@ jobs:
             org.opencontainers.image.version=${{ steps.prep.outputs.version }}
           build-args: ${{ steps.prep.outputs.build-args }}
 
-      - name: Dive Analysis
-        uses: yuichielectric/dive-action@0.0.4
-        with:
-          image: "${{ steps.prep.outputs.tag }}"
 
   publish:
     runs-on: ubuntu-20.04
     needs: [build, updates]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ secrets.DOCKER_HUB_USER }}
@@ -164,10 +162,10 @@ jobs:
           IMAGE="$(echo ${GITHUB_REPOSITORY//docker-/} | tr '[:upper:]' '[:lower:]')"
           TAG=${GITHUB_REF//refs\/heads\//}
           SOURCE=${IMAGE}:${TAG}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}
-          docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
-          docker manifest create ${IMAGE}:${TAG}-${conreq_commit:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${conreq_commit:0:8}
-          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
-          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
+          docker buildx imagetools create -t ${IMAGE}:${TAG} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
+          docker buildx imagetools create -t ${IMAGE}:${TAG}-${conreq_commit:0:8} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${conreq_commit:0:8}
+          docker buildx imagetools create -t ${IMAGE}:latest ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker buildx imagetools create -t ${IMAGE}:conreq-${{ needs.updates.outputs.commit }} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
 
       - name: Create manifests for GitHub Container Registry
         env:
@@ -177,7 +175,7 @@ jobs:
           IMAGE="ghcr.io/$(echo ${GITHUB_REPOSITORY//docker-/} | tr '[:upper:]' '[:lower:]')"
           TAG=${GITHUB_REF//refs\/heads\//}
           SOURCE=${IMAGE}:${TAG}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}
-          docker manifest create ${IMAGE}:${TAG}                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
-          docker manifest create ${IMAGE}:${TAG}-${conreq_commit:0:8}                          --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${conreq_commit:0:8}
-          docker manifest create ${IMAGE}:latest                                            --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
-          docker manifest create ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}        --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}
+          docker buildx imagetools create -t ${IMAGE}:${TAG} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
+          docker buildx imagetools create -t ${IMAGE}:${TAG}-${conreq_commit:0:8} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${conreq_commit:0:8}
+          docker buildx imagetools create -t ${IMAGE}:latest ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker buildx imagetools create -t ${IMAGE}:conreq-${{ needs.updates.outputs.commit }} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:conreq-${{ needs.updates.outputs.commit }}

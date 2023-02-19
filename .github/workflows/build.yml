@@ -29,13 +29,13 @@ jobs:
             export DOCKER_TAGS=$(curl -s "https://registry.hub.docker.com/api/content/v1/repositories/public/roxedus/conreq/tags?page_size=1000")
             if echo "${DOCKER_TAGS}" | grep -q "\"main-${CONREQ_VERSION}\""; then
               echo "latest version ${CONREQ_VERSION} already built"
-              echo "name=commit=no" >> $GITHUB_OUTPUT
+              echo "commit=no" >> $GITHUB_OUTPUT
             else
-              echo "name=commit=${CONREQ_VERSION}" >> $GITHUB_OUTPUT
+              echo "commit=${CONREQ_VERSION}" >> $GITHUB_OUTPUT
               echo "Commit manually built"
             fi
           else
-            echo "name=commit=${GITHUB_EVENT_INPUTS_CONREQ_VERSION}" >> $GITHUB_OUTPUT
+            echo "commit=${GITHUB_EVENT_INPUTS_CONREQ_VERSION}" >> $GITHUB_OUTPUT
             echo "Commit automatically built"
           fi
 
@@ -96,18 +96,18 @@ jobs:
           conreq_commit: ${{ needs.updates.outputs.commit }}
         run: |
           ARCHITECTURE=${{ matrix.architecture }}
-          echo "name=created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-          echo "name=title=${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
-          echo "name=revision=${conreq_commit}" >> $GITHUB_OUTPUT
-          echo "name=source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
-          echo "name=vendor=${{ github.repository_owner }}" >> $GITHUB_OUTPUT
-          echo "name=url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md" >> $GITHUB_OUTPUT
-          echo "name=platform=${ARCHITECTURE//-/\/}" >> $GITHUB_OUTPUT
-          echo "name=cache="$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-          echo "name=tag="$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-          echo "name=version=${conreq_commit}" >> $GITHUB_OUTPUT
+          echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "title=${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
+          echo "revision=${conreq_commit}" >> $GITHUB_OUTPUT
+          echo "source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/${GITHUB_REF//refs\/heads\//}" >> $GITHUB_OUTPUT
+          echo "vendor=${{ github.repository_owner }}" >> $GITHUB_OUTPUT
+          echo "url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md" >> $GITHUB_OUTPUT
+          echo "platform=${ARCHITECTURE//-/\/}" >> $GITHUB_OUTPUT
+          echo "cache=$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-cache-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "tag=$(echo ${GITHUB_REPOSITORY//docker-/}:${GITHUB_REF//refs\/heads\//}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "version=${conreq_commit}" >> $GITHUB_OUTPUT
           if [[ ! ${conreq_commit} == "no" ]]; then
-            echo "name=build-args=CONREQ_VERSION=${conreq_commit}" >> $GITHUB_OUTPUT
+            echo "build-args=CONREQ_VERSION=${conreq_commit}" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push

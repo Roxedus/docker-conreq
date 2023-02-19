@@ -175,7 +175,7 @@ jobs:
           IMAGE="ghcr.io/$(echo ${GITHUB_REPOSITORY//docker-/} | tr '[:upper:]' '[:lower:]')"
           TAG=${GITHUB_REF//refs\/heads\//}
           SOURCE=${IMAGE}:${TAG}-${conreq_commit:0:8}-${GITHUB_RUN_NUMBER}
-          docker buildx imagetools create -t ${IMAGE}:${TAG} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
+          docker buildx imagetools create -t ${IMAGE}:${TAG} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64
           docker buildx imagetools create -t ${IMAGE}:${TAG}-${conreq_commit:0:8} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64
           docker buildx imagetools create -t ${IMAGE}:latest ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64
           docker buildx imagetools create -t ${IMAGE}:conreq-${{ needs.updates.outputs.commit }} ${SOURCE}-linux-amd64 ${SOURCE}-linux-arm-v7 ${SOURCE}-linux-arm64

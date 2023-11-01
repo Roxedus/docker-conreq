@@ -1,8 +1,8 @@
 name: Check develop
 
 on:
-  schedule:
-    - cron: "30 * * * *"
+  # schedule:
+  #   - cron: "30 * * * *"
   push:
     paths:
       - ".github/workflows/check-develop.yml"

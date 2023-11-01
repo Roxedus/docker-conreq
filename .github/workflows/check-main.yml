@@ -1,8 +1,8 @@
 name: Check main
 
 on:
-  schedule:
-    - cron: "0 * * * *"
+  # schedule:
+  #   - cron: "0 * * * *"
   push:
     paths:
       - ".github/workflows/check-main.yml"
